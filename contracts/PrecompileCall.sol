@@ -21,29 +21,20 @@ contract PrecompileCall {
     function F(bytes32[2] memory h, bytes32[4] memory m, uint64[2] memory t, bool f, uint32 rounds) public view returns (bytes32[2] memory) {
       bytes32[2] memory output;
 
-      bytes32 _t0 = bytes32(uint256(t[0]));
-      bytes32 _t1 = bytes32(uint256(t[1]));
-
-      bytes32 _f;
-      if (f) {
-        _f = hex"0000000000000000000000000000000000000000000000000000000000000001"; 
-      }
-	
-      bytes32 _rounds = bytes32(uint256(rounds));
-
-      bytes32[10] memory args = [ h[0], h[1], m[0], m[1], m[2], m[3], _t0, _t1, _f, _rounds ];
+      bytes memory args = abi.encodePacked(h[0], h[1], m[0], m[1], m[2], m[3], t[0], t[1], f, rounds);
 
       assembly {
-            if iszero(staticcall(not(0), 0x09, args, 0x140, output, 0x40)) {
+            if iszero(staticcall(not(0), 0x09, add(args, 32), 0xd5, output, 0x40)) {
                 revert(0, 0)
             }
-        }
-        return output;
+      }
+
+      return output;
     }
 
     function callF() public view returns (bytes32[2] memory) {
       bytes32[2] memory h;
-      h[0] = hex"6a09e627f3bcc909bb67ae8484caa73b3c6ef372fe94b82ba54ff53a5f1d36f1"; 
+      h[0] = hex"6a09e627f3bcc909bb67ae8484caa73b3c6ef372fe94b82ba54ff53a5f1d36f2"; 
       h[1] = hex"510e527fade682d19b05688c2b3e6c1f1f83d9abfb41bd6b5be0cd19137e2179";
   
       bytes32[4] memory m;
@@ -53,8 +44,8 @@ contract PrecompileCall {
       m[3] = hex"0000000000000000000000000000000000000000000000000000000000000000";
  
       uint64[2] memory t;
-      t[0] = 18446744073709551552;
-      t[1] = 18446744073709551615;	
+      t[0] = 18446744073709551552;  // ffffffffffffffc0
+      t[1] = 18446744073709551615;	// ffffffffffffffff
 
       bool f = true;
 
