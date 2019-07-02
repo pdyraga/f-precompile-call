@@ -18,7 +18,7 @@ contract PrecompileCall {
         return precompiledExpmod(5, 3, 13);
     }
 
-    function F(bytes32[2] memory h, bytes32[4] memory m, uint64[2] memory t, bool f, uint32 rounds) public view returns (bytes32[2] memory) {
+    function F(uint32 rounds, bytes32[2] memory h, bytes32[4] memory m, uint64[2] memory t, bool f) public view returns (bytes32[2] memory) {
       bytes32[2] memory output;
 
       bytes memory args = abi.encodePacked(rounds, h[0], h[1], m[0], m[1], m[2], m[3], t[0], t[1], f);
@@ -66,6 +66,6 @@ contract PrecompileCall {
 
       bool f = true; // 01
 
-      return F(h, m, t, f, rounds);
+      return F(rounds, h, m, t, f);
     }
 }
